@@ -308,20 +308,11 @@ namespace SortingVisualiser
                     {
                         min = j;
                     }
-                    if (slow)
-                    {
-                        canv.Children.Clear();
-                        Redraw(numbers);
-                        await Task.Delay(1);
-                    }
                 }
                 Swap(ref numbers[min], ref numbers[i]);
-                if (!slow)
-                {
-                    canv.Children.Clear();
-                    Redraw(numbers);
-                    await Task.Delay(1);
-                }
+                canv.Children.Clear();
+                Redraw(numbers);
+                await Task.Delay(1);
             }
             generateBtn.IsEnabled = true;
             sizeSlider.IsEnabled = true;
