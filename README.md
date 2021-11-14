@@ -5,7 +5,7 @@ This repository contains C# based implementations of different sorting algorithm
 
 ## Example 
 
-![Example Gif](/Images/SortingVisualiser.gif)
+![Example Gif](/Images/sorting-visualiser.gif)
 
 ## The Current implementation includes:
 
