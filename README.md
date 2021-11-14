@@ -3,6 +3,10 @@ This repository contains C# based implementations of different sorting algorithm
 
 ☝ *Please note that this project mainly serves educational purposes. As I´m still relatively new to C# and WPF the code will have some flaws. Certain features are WIP still.*
 
+## Example 
+
+![Example Gif](sorting-algorithm-visualiser/Images/SortingVisualiser.gif)
+
 ## The Current implementation includes:
 
 * Bubble Sort
@@ -13,3 +17,4 @@ This repository contains C# based implementations of different sorting algorithm
 More sorting algorithms will be added later!
 
 
+sorting-algorithm-visualiser/Images/SortingVisualiser.gif
