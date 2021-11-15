@@ -81,14 +81,7 @@ namespace SortingVisualiser
             canv.Children.Clear();
             Redraw(numbers);
 
-            if (speed.SelectedIndex == 0)
-            {
-                slow = true;
-            }
-            else
-            {
-                slow = false;
-            }
+            slow = speed.SelectedIndex == 0 ? true : false;
             switch (algorithms.SelectedIndex)
             {
                 case 0:
@@ -147,6 +140,19 @@ namespace SortingVisualiser
 
             canv.Children.Add(rect);
         }
+        public async Task SwapRect(Rectangle rect1, Rectangle rect2, int size1, int size2)
+        {
+            rect1.Height = canv.ActualHeight * size2 / 1000;
+            rect2.Height = canv.ActualHeight * size1 / 1000;
+            var c1 = ((SolidColorBrush)rect1.Fill).Color;
+            var c2 = ((SolidColorBrush)rect2.Fill).Color;
+            rect1.Fill = new SolidColorBrush(c2);
+            rect2.Fill = new SolidColorBrush(c1);
+
+            rect1.ToolTip = size2;
+            rect2.ToolTip = size1;
+        }
+
 
         // HSL to RGB converter
         public static ColorRGB HSL2RGB(double h, double sl, double l)
@@ -239,23 +245,16 @@ namespace SortingVisualiser
                 {
                     if (numbers[i] > numbers[i + 1])
                     {
+                        await SwapRect((Rectangle)canv.Children[i], (Rectangle)canv.Children[i + 1], numbers[i], numbers[i + 1]);
+
                         Swap(ref numbers[i], ref numbers[i + 1]);
-                        if (slow)
-                        {
-                            canv.Children.Clear();
-                            Redraw(numbers);
-                            await Task.Delay(1);
-                        }
+
+                        await Task.Delay(slow ? 1 : 0);
                     }
                     swapPos = i + 1;
                 }
                 n = swapPos;
-                if (!slow)
-                {
-                    canv.Children.Clear();
-                    Redraw(numbers);
-                    await Task.Delay(1);
-                }
+                await Task.Delay(!slow ? 1 : 0);
             }
             while (n > 1);
 
@@ -274,21 +273,13 @@ namespace SortingVisualiser
                 {
                     if (numbers[j - 1] > numbers[j])
                     {
+                        await SwapRect((Rectangle)canv.Children[j-1], (Rectangle)canv.Children[j], numbers[j-1], numbers[j]);
+
                         Swap(ref numbers[j - 1], ref numbers[j]);
-                        if (slow)
-                        {
-                            canv.Children.Clear();
-                            Redraw(numbers);
-                            await Task.Delay(1);
-                        }
+                        await Task.Delay(slow ? 1 : 0);
                     }
                 }
-                if (!slow)
-                {
-                    canv.Children.Clear();
-                    Redraw(numbers);
-                    await Task.Delay(1);
-                }
+                await Task.Delay(!slow ? 1 : 0);
             }
             generateBtn.IsEnabled = true;
             sizeSlider.IsEnabled = true;
@@ -308,11 +299,13 @@ namespace SortingVisualiser
                     {
                         min = j;
                     }
+                    await Task.Delay(slow ? 1 : 0);
+
                 }
+                await SwapRect((Rectangle)canv.Children[min], (Rectangle)canv.Children[i], numbers[min], numbers[i]);
+
                 Swap(ref numbers[min], ref numbers[i]);
-                canv.Children.Clear();
-                Redraw(numbers);
-                await Task.Delay(1);
+                await Task.Delay(!slow ? 1 : 0);
             }
             generateBtn.IsEnabled = true;
             sizeSlider.IsEnabled = true;
@@ -336,8 +329,6 @@ namespace SortingVisualiser
                 endIndex = stack[top--];
                 startIndex = stack[top--];
 
-                //int p = partition(numbers, startIndex, endIndex);
-
                 int pivot = numbers[endIndex];
                 int i = (startIndex - 1);
                 for (int j = startIndex; j <= endIndex - 1; ++j)
@@ -345,48 +336,30 @@ namespace SortingVisualiser
                     if (numbers[j] <= pivot)
                     {
                         ++i;
+                        await SwapRect((Rectangle)canv.Children[i], (Rectangle)canv.Children[j], numbers[i], numbers[j]);
+
                         Swap(ref numbers[i], ref numbers[j]);
-                        if (slow)
-                        {
-                            canv.Children.Clear();
-                            Redraw(numbers);
-                            await Task.Delay(1);
-                        }
+                        await Task.Delay(slow ? 1 : 0);
                     }
                 }
-
+                await SwapRect((Rectangle)canv.Children[i+1], (Rectangle)canv.Children[endIndex], numbers[i+1], numbers[endIndex]);
                 Swap(ref numbers[i + 1], ref numbers[endIndex]);
 
-                if (slow)
-                {
-                    canv.Children.Clear();
-                    Redraw(numbers);
-                    await Task.Delay(1);
-                }
+                await Task.Delay(slow ? 1 : 0);
                 int p = i + 1;
 
                 if (p - 1 > startIndex)
                 {
                     stack[++top] = startIndex;
                     stack[++top] = p - 1;
-                    if (!slow)
-                    {
-                        canv.Children.Clear();
-                        Redraw(numbers);
-                        await Task.Delay(1);
-                    }
+                    await Task.Delay(!slow ? 1 : 0);
                 }
 
                 if (p + 1 < endIndex)
                 {
                     stack[++top] = p + 1;
                     stack[++top] = endIndex;
-                    if (!slow)
-                    {
-                        canv.Children.Clear();
-                        Redraw(numbers);
-                        await Task.Delay(1);
-                    }
+                    await Task.Delay(!slow ? 1 : 0);
                 }
             }
             generateBtn.IsEnabled = true;
@@ -398,36 +371,5 @@ namespace SortingVisualiser
             i = p;
             p = temp;
         }
-
-        // Deprecated for now ...
-        /*
-            public void QuickSort (int[] numbers, int low, int high)
-            {
-
-                if (low < high)
-                {
-                    int p = partition(numbers, low, high);
-                    QuickSort(numbers, 1, p - 1);
-
-                    QuickSort(numbers, p + 1, high);
-                }
-            }
-            public int partition(int[] numbers, int low, int high)
-            {
-                int pivot = numbers[high];
-                int i = (low - 1);
-                for (int j = low; j <= high - 1; ++j)
-                {
-                    if (numbers[j] <= pivot)
-                    {
-                        ++i;
-                        Swap(ref numbers[i], ref numbers[j]);
-                    }
-                }
-                Swap(ref numbers[i + 1], ref numbers[high]);
-                return i + 1;
-            }
-
-        */
     }
 }
