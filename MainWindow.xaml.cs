@@ -78,9 +78,6 @@ namespace SortingVisualiser
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            canv.Children.Clear();
-            Redraw(numbers);
-
             slow = speed.SelectedIndex == 0 ? true : false;
             switch (algorithms.SelectedIndex)
             {
@@ -300,7 +297,6 @@ namespace SortingVisualiser
                         min = j;
                     }
                     await Task.Delay(slow ? 1 : 0);
-
                 }
                 await SwapRect((Rectangle)canv.Children[min], (Rectangle)canv.Children[i], numbers[min], numbers[i]);
 

@@ -46,8 +46,8 @@
                           Margin="0,0,20,0"
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center">
-                    <ComboBoxItem Content="1x"/>
-                    <ComboBoxItem Content="2x" IsSelected="True"/>
+                    <ComboBoxItem Content="SLOW"/>
+                    <ComboBoxItem Content="FAST" IsSelected="True"/>
                 </ComboBox>
 
                 <Slider Minimum="50"
