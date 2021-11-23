@@ -41,22 +41,19 @@ namespace SortingVisualiser
             InitializeComponent();
             this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
             this.SizeChanged += new SizeChangedEventHandler(MainWindow_SizeChanged);
-
         }
         Random r = new Random();
 
-        static int numbersSize = 300;
-        int[] numbers = new int[numbersSize];
-        bool slow = true;
+        int numbersSize = 300;
+        int[] numbers = new int[300];
+        bool slow;
 
         // Window events
         private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             canv.Children.Clear();
             Redraw(numbers);
-
-            var width = mainGrid.ActualWidth;
-            sizeSlider.Width = width * .4 - 90;
+            sizeSlider.Width = mainGrid.ActualWidth * .4 - 90;
         }
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -93,13 +90,16 @@ namespace SortingVisualiser
                 case 3:
                     QuickSortIterative(numbers);
                     break;
+                case 4:
+                    MergeSort(numbers);
+                    break;
                 default:
                     BubbleSort(numbers);
                     break;
             }
         }
 
-        // Visualization logic
+        // Visualisation logic
         public void Generate()
         {
             numbers = new int[numbersSize];
@@ -107,7 +107,7 @@ namespace SortingVisualiser
 
             for (int i = 0; i < numbersSize; ++i)
             {
-                numbers[i] = r.Next(0, 1000);
+                numbers[i] = r.Next(1, 1000);
             }
             Redraw(numbers);
             startBtn.IsEnabled = true;
@@ -125,14 +125,12 @@ namespace SortingVisualiser
             rect.Height = canv.ActualHeight * size / 1000;
             var width = canv.ActualWidth / Convert.ToDouble(numbersSize);
             rect.Width = width;
-
             Canvas.SetLeft(rect, pos * width);
             Canvas.SetBottom(rect, 0);
 
             ColorRGB c = HSL2RGB(Convert.ToDouble(size) / 1000, 0.5, 0.5);
             SolidColorBrush brush = new SolidColorBrush(c);
             rect.Fill = brush;
-
             rect.ToolTip = size;
 
             canv.Children.Add(rect);
@@ -145,11 +143,9 @@ namespace SortingVisualiser
             var c2 = ((SolidColorBrush)rect2.Fill).Color;
             rect1.Fill = new SolidColorBrush(c2);
             rect2.Fill = new SolidColorBrush(c1);
-
             rect1.ToolTip = size2;
             rect2.ToolTip = size1;
         }
-
 
         // HSL to RGB converter
         public static ColorRGB HSL2RGB(double h, double sl, double l)
@@ -360,6 +356,92 @@ namespace SortingVisualiser
             }
             generateBtn.IsEnabled = true;
             sizeSlider.IsEnabled = true;
+        }
+        public async void MergeSort(int[] numbers)
+        {
+            startBtn.IsEnabled = false;
+            generateBtn.IsEnabled = false;
+            sizeSlider.IsEnabled = false;
+
+            int length = 1;
+            while (length < numbers.Length)
+            {
+                int i = 0;
+
+                while (i < numbers.Length)
+                {
+                    int l1 = i;
+                    int r1 = i + length - 1;
+                    int l2 = i + length;
+                    int r2 = i + 2 * length - 1;
+                    if (l2 >= numbers.Length)
+                    {
+                        break;
+                    }
+                    if (r2 >= numbers.Length)
+                    {
+                        r2 = numbers.Length - 1;
+                    }
+
+                    int[] temp = Merge(numbers, l1, r1, l2, r2);
+
+                    for (int j = 0; j < r2-l1+1; ++j)
+                    {
+                        numbers[i+j] = temp[j];
+
+                        if (slow)
+                        {
+                            canv.Children.Clear();
+                            Redraw(numbers);
+                            await Task.Delay(1);
+                        }
+                    }
+                    i += length * 2;
+                    if (!slow)
+                    {
+                        canv.Children.Clear();
+                        Redraw(numbers);
+                        await Task.Delay(1);
+                    }
+                }
+                length *= 2;
+            }
+            generateBtn.IsEnabled = true;
+            sizeSlider.IsEnabled = true;
+        }
+        public int[] Merge(int[] arr, int l1, int r1, int l2, int r2)
+        {
+            int[] temp = new int[arr.Length];
+            int count = 0;
+
+            while (l1 <= r1 && l2 <= r2)
+            {
+                if (arr[l1] <= arr[l2])
+                {
+                    temp[count] = arr[l1];
+                    count++;
+                    l1++;
+                }
+                else
+                {
+                    temp[count] = arr[l2];
+                    count++;
+                    l2++;
+                }
+            }
+            while (l1 <= r1)
+            {
+                temp[count] = arr[l1];
+                count++;
+                l1++;
+            }
+            while (l2 <= r2)
+            {
+                temp[count] = arr[l2];
+                count++;
+                l2++;
+            }
+            return temp;
         }
         public void Swap(ref int i, ref int p)
         {

@@ -40,6 +40,7 @@
                     <ComboBoxItem Content="Insertion Sort"/>
                     <ComboBoxItem Content="Selection Sort"/>
                     <ComboBoxItem Content="Quick Sort"/>
+                    <ComboBoxItem Content="Merge Sort"/>
                 </ComboBox>
                 <ComboBox x:Name="speed"
                           FontSize="20"
