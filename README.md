@@ -10,8 +10,8 @@ When running slow sorting speed I recommend using an array size of 50-200 (depen
 * Bubble Sort
 * Insertion Sort
 * Selection Sort
-* Quick Sort
 * Merge Sort
+* Quick Sort
 
 *More sorting algorithms will be added over time!*\
 \
