@@ -13,6 +13,6 @@ When running slow sorting speed I recommend using an array size of 50-200 (depen
 * Quick Sort
 * Merge Sort
 
-*More sorting algorithms will be added later!*\
+*More sorting algorithms will be added over time!*\
 \
 ![Example Gif](/Images/SortingVisualiser.gif)
