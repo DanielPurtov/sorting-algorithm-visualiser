@@ -14,4 +14,4 @@ When running slow sorting speed I recommend using an array size of 50-200 (depen
 
 *More sorting algorithms will be added later!*\
 \
-![Example Gif](/Images/sorting-visualiser.gif)
+![Example Gif](/Images/SortingVisualiser.gif)
