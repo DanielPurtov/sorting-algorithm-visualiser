@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,9 +16,9 @@ namespace SortingVisualiser
 
         public ColorRGB(Color value)
         {
-            this.R = value.R;
-            this.G = value.G;
-            this.B = value.B;
+            R = value.R;
+            G = value.G;
+            B = value.B;
         }
 
         public static implicit operator Color(ColorRGB rgb)
@@ -27,23 +26,16 @@ namespace SortingVisualiser
             Color c = Color.FromRgb(rgb.R, rgb.G, rgb.B);
             return c;
         }
-
-        public static explicit operator ColorRGB(Color c)
-        {
-            return new ColorRGB(c);
-        }
-
     }
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
-            this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
-            this.SizeChanged += new SizeChangedEventHandler(MainWindow_SizeChanged);
+            Loaded += new RoutedEventHandler(MainWindow_Loaded);
+            SizeChanged += new SizeChangedEventHandler(MainWindow_SizeChanged);
         }
-        Random r = new Random();
-
+        readonly Random r = new();
         int numbersSize = 300;
         int[] numbers = new int[300];
         bool slow;
@@ -57,7 +49,7 @@ namespace SortingVisualiser
         }
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            sizeSlider.ValueChanged += slider_ValueChanged;
+            sizeSlider.ValueChanged += Slider_ValueChanged;
             sizeSlider.Value = 300;
             sizeLbl.Content = " \u03A3 = " + sizeSlider.Value;
             Generate();
@@ -68,15 +60,16 @@ namespace SortingVisualiser
         {
             Generate();
         }
-        private void slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             sizeLbl.Content = " \u03A3 = " + sizeSlider.Value;
             numbersSize = Convert.ToInt32(sizeSlider.Value);
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            slow = speed.SelectedIndex == 0 ? true : false;
-            switch (algorithms.SelectedIndex)
+            slow = speed.SelectedIndex == 0;
+
+            switch (alg.SelectedIndex)
             {
                 case 0:
                     BubbleSort(numbers);
@@ -88,10 +81,10 @@ namespace SortingVisualiser
                     SelectionSort(numbers);
                     break;
                 case 3:
-                    QuickSortIterative(numbers);
+                    MergeSort(numbers);
                     break;
                 case 4:
-                    MergeSort(numbers);
+                    QuickSort(numbers);
                     break;
                 default:
                     BubbleSort(numbers);
@@ -121,21 +114,18 @@ namespace SortingVisualiser
         }
         public void DrawRect(int pos, int size)
         {
-            Rectangle rect = new Rectangle();
-            rect.Height = canv.ActualHeight * size / 1000;
-            var width = canv.ActualWidth / Convert.ToDouble(numbersSize);
-            rect.Width = width;
-            Canvas.SetLeft(rect, pos * width);
+            Rectangle rect = new()
+            {
+                Height = canv.ActualHeight * size / 1000,
+                Width = canv.ActualWidth / Convert.ToDouble(numbersSize),
+                Fill = new SolidColorBrush(HSL2RGB(Convert.ToDouble(size) / 1000, 0.5, 0.5)),
+                ToolTip = size
+            };
+            Canvas.SetLeft(rect, pos * canv.ActualWidth / Convert.ToDouble(numbersSize));
             Canvas.SetBottom(rect, 0);
-
-            ColorRGB c = HSL2RGB(Convert.ToDouble(size) / 1000, 0.5, 0.5);
-            SolidColorBrush brush = new SolidColorBrush(c);
-            rect.Fill = brush;
-            rect.ToolTip = size;
-
             canv.Children.Add(rect);
         }
-        public async Task SwapRect(Rectangle rect1, Rectangle rect2, int size1, int size2)
+        public void SwapRect(Rectangle rect1, Rectangle rect2, int size1, int size2)
         {
             rect1.Height = canv.ActualHeight * size2 / 1000;
             rect2.Height = canv.ActualHeight * size1 / 1000;
@@ -151,29 +141,21 @@ namespace SortingVisualiser
         public static ColorRGB HSL2RGB(double h, double sl, double l)
 
         {
-            double v;
-            double r, g, b;
-
-            r = l;
-            g = l;
-            b = l;
-            v = (l <= 0.5) ? (l * (1.0 + sl)) : (l + sl - l * sl);
+            double r = l;
+            double g = l;
+            double b = l;
+            double v = (l <= 0.5) ? (l * (1.0 + sl)) : (l + sl - l * sl);
 
             if (v > 0)
             {
-                double m;
-                double sv;
-                int sextant;
-                double fract, vsf, mid1, mid2;
-
-                m = l + l - v;
-                sv = (v - m) / v;
+                double m = l + l - v;
+                double sv = (v - m) / v;
                 h *= 6.0;
-                sextant = (int)h;
-                fract = h - sextant;
-                vsf = v * sv * fract;
-                mid1 = m + vsf;
-                mid2 = v - vsf;
+                int sextant = (int)h;
+                double fract = h - sextant;
+                double vsf = v * sv * fract;
+                double mid1 = m + vsf;
+                double mid2 = v - vsf;
 
                 switch (sextant)
 
@@ -238,10 +220,8 @@ namespace SortingVisualiser
                 {
                     if (numbers[i] > numbers[i + 1])
                     {
-                        await SwapRect((Rectangle)canv.Children[i], (Rectangle)canv.Children[i + 1], numbers[i], numbers[i + 1]);
-
+                        SwapRect((Rectangle)canv.Children[i], (Rectangle)canv.Children[i + 1], numbers[i], numbers[i + 1]);
                         Swap(ref numbers[i], ref numbers[i + 1]);
-
                         await Task.Delay(slow ? 1 : 0);
                     }
                     swapPos = i + 1;
@@ -266,8 +246,7 @@ namespace SortingVisualiser
                 {
                     if (numbers[j - 1] > numbers[j])
                     {
-                        await SwapRect((Rectangle)canv.Children[j-1], (Rectangle)canv.Children[j], numbers[j-1], numbers[j]);
-
+                        SwapRect((Rectangle)canv.Children[j-1], (Rectangle)canv.Children[j], numbers[j-1], numbers[j]);
                         Swap(ref numbers[j - 1], ref numbers[j]);
                         await Task.Delay(slow ? 1 : 0);
                     }
@@ -294,15 +273,14 @@ namespace SortingVisualiser
                     }
                     await Task.Delay(slow ? 1 : 0);
                 }
-                await SwapRect((Rectangle)canv.Children[min], (Rectangle)canv.Children[i], numbers[min], numbers[i]);
-
+                SwapRect((Rectangle)canv.Children[min], (Rectangle)canv.Children[i], numbers[min], numbers[i]);
                 Swap(ref numbers[min], ref numbers[i]);
                 await Task.Delay(!slow ? 1 : 0);
             }
             generateBtn.IsEnabled = true;
             sizeSlider.IsEnabled = true;
         }
-        public async void QuickSortIterative(int[] numbers)
+        public async void QuickSort(int[] numbers)
         {
             startBtn.IsEnabled = false;
             generateBtn.IsEnabled = false;
@@ -328,15 +306,13 @@ namespace SortingVisualiser
                     if (numbers[j] <= pivot)
                     {
                         ++i;
-                        await SwapRect((Rectangle)canv.Children[i], (Rectangle)canv.Children[j], numbers[i], numbers[j]);
-
+                        SwapRect((Rectangle)canv.Children[i], (Rectangle)canv.Children[j], numbers[i], numbers[j]);
                         Swap(ref numbers[i], ref numbers[j]);
                         await Task.Delay(slow ? 1 : 0);
                     }
                 }
-                await SwapRect((Rectangle)canv.Children[i+1], (Rectangle)canv.Children[endIndex], numbers[i+1], numbers[endIndex]);
+                SwapRect((Rectangle)canv.Children[i+1], (Rectangle)canv.Children[endIndex], numbers[i+1], numbers[endIndex]);
                 Swap(ref numbers[i + 1], ref numbers[endIndex]);
-
                 await Task.Delay(slow ? 1 : 0);
                 int p = i + 1;
 
@@ -409,7 +385,7 @@ namespace SortingVisualiser
             generateBtn.IsEnabled = true;
             sizeSlider.IsEnabled = true;
         }
-        public int[] Merge(int[] arr, int l1, int r1, int l2, int r2)
+        public static int[] Merge(int[] arr, int l1, int r1, int l2, int r2)
         {
             int[] temp = new int[arr.Length];
             int count = 0;
@@ -443,7 +419,7 @@ namespace SortingVisualiser
             }
             return temp;
         }
-        public void Swap(ref int i, ref int p)
+        public static void Swap(ref int i, ref int p)
         {
             int temp = i;
             i = p;

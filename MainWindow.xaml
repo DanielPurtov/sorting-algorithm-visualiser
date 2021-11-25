@@ -31,7 +31,7 @@
                 <Label Height="40"
                        FontSize="20"
                        Content="Sorting Algorithm: "/>
-                <ComboBox x:Name="algorithms"
+                <ComboBox x:Name="alg"
                           FontSize="20"
                           Margin="0,0,10,0"
                           HorizontalAlignment="Center"
@@ -39,8 +39,8 @@
                     <ComboBoxItem Content="Bubble Sort" IsSelected="True"/>
                     <ComboBoxItem Content="Insertion Sort"/>
                     <ComboBoxItem Content="Selection Sort"/>
-                    <ComboBoxItem Content="Quick Sort"/>
                     <ComboBoxItem Content="Merge Sort"/>
+                    <ComboBoxItem Content="Quick Sort"/>
                 </ComboBox>
                 <ComboBox x:Name="speed"
                           FontSize="20"
